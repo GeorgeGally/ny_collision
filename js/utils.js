@@ -249,84 +249,9 @@ function getLocs(d, gmap){
 }
 
 
-function resetMap(){
-		ctx.clearRect(0,0,w,h);
-		heatmapData = [];
-		particles = [];
-		counter = 0;
-		active_lines = [];
-		line = [];
-		total_pedestrians_injured = 0, total_pedestrians_deaths = 0;
-		total_cyclists_injured = 0, total_cyclists_deaths = 0;
-		total_motorists_injured = 0, total_motorists_deaths = 0;
-		total_deaths = 0, total_injured = 0;
-		monday = 0, tuesday = 0, wednesday = 0, thursday = 0, friday = 0, saturday = 0, sunday = 0;
-
-		for (var i = 0; i < markers.length; i++) {
-			markers[i].setMap(null);
-		}
-
-		markers = [];
-		if(heatmap) heatmap.setMap(null);
-
-}
 
 
-
-
-function turnMain(val){
-	$('#motorists_checked').prop( "checked", val );
-	$('#cyclists_checked').prop( "checked", val );
-	$('#pedestrians_checked').prop( "checked", val );
-	filter_pedestrian = val;
-	filter_cyclist = val;
-	filter_motorist = val;
-}
-
-
-function turnOffAllChecked(){
-	$('#all_accidents').prop( "checked", false );
-	turnAllChecked(false)
-}
-
-
-
-	function turnDays(val){
-		$('#mon_check').prop( "checked", val );
-		$('#tues_check').prop( "checked", val );
-		$('#wed_check').prop( "checked", val );
-		$('#thurs_check').prop( "checked", val );
-		$('#fri_check').prop( "checked", val );
-		$('#sat_check').prop( "checked", val );
-		$('#sun_check').prop( "checked", val );
-		$('#days_checked').prop( "checked", val );
-	}
-
- function turnAllChecked(val){
- 	//$('#total_injured').prop( "checked", val );
- 	//$('#total_killed').prop( "checked", val );
- 	//$('#ok_checked').prop( "checked", val );
-	if(val == true) {
-		turnMain(true);
-		turnSubs("injured", true);
-		turnSubs("killed", true);
-	}
- }
-
-
- function turnSubs(type, val){
- 	$('#motorists_' + type).prop( "checked", val );
- 	$('#cyclists_' + type).prop( "checked", val );
- 	$('#pedestrians_' + type).prop( "checked", val );
-	if(val == false) {
-		turnMain(false);
-	}
- }
-
-
-
-
-	 function addLocCross(d, _loc){
+function addLocCross(d, _loc){
 		var loc = _loc || new google.maps.LatLng(d.LATITUDE, d.LONGITUDE);
 		var px = fromLatLngToPixel(loc, gmap);
  	 	ctx.fillStyle = "red";

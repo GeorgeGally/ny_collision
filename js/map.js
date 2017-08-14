@@ -20,6 +20,100 @@ var markers = [];
 var infowindows = [];
 
 
+	 window.onload = function(){
+
+	 	var location = {
+	         "lat": 40.7090,
+	         "lng": -73.85
+	     };
+
+	 	var myLatlng = new google.maps.LatLng(location.lat, location.lng);
+
+	 	var mapOptions = {
+	 		zoom: 11,
+	 		styles: dark,
+	 		center: myLatlng,
+	 		mapTypeId: google.maps.MapTypeId.ROAD,
+	 		disableDefaultUI: false,
+	 		scrollwheel: false,
+	 		draggable: true,
+	 		navigationControl: false,
+	 		mapTypeControl: false,
+	 		scaleControl: true,
+	 		streetViewControl: false,
+	 		zoomControl: true,
+	 		zoomControlOptions: {
+	          position: google.maps.ControlPosition.LEFT_BOTTOM
+	     },
+	 		disableDoubleClickZoom: false
+	 	};
+
+	 	gmap = new google.maps.Map(document.getElementById("map"), mapOptions);
+
+	 	// initialize the canvasLayer
+	 	var canvasLayerOptions = {
+	 		map: gmap,
+	 		resizeHandler: resize,
+	 		animate: true,
+	 		updateHandler: draw,
+	 		resolutionScale: resolutionScale
+	 	};
+
+	 	canvasLayer = new CanvasLayer(canvasLayerOptions);
+	 	ctx = canvasLayer.canvas.getContext('2d');
+
+	 	ctx.font = "18px Monospace";
+	 	ctx.textAlign = "center";
+	 	ctx.moveTo(w/2, h/2);
+	 	ctx.beginPath();
+	 	ctx.lineCap = 'round';
+	 	ctx.lineWidth = 2;
+
+	 	google.maps.event.addListener(gmap, "drag", function(){
+	 		if(viz !=4) resetMap();
+	 	});
+
+	 	google.maps.event.addListener(gmap, "zoom_changed", function(){
+	 		if(viz !=4) resetMap();
+	 	});
+
+	 	google.maps.event.addListenerOnce(gmap, "idle", function(){
+
+	 		mapLoaded = true;
+	 		ctx.clearRect(0, 0, w, h);
+
+	 		loadData();
+
+	 });
+
+	 };
+
+
+
+	 function resetMap(){
+	 		ctx.clearRect(0,0,w,h);
+	 		heatmapData = [];
+	 		particles = [];
+	 		counter = 0;
+	 		active_lines = [];
+	 		line = [];
+	 		total_pedestrians_injured = 0, total_pedestrians_deaths = 0;
+	 		total_cyclists_injured = 0, total_cyclists_deaths = 0;
+	 		total_motorists_injured = 0, total_motorists_deaths = 0;
+	 		total_deaths = 0, total_injured = 0;
+	 		monday = 0, tuesday = 0, wednesday = 0, thursday = 0, friday = 0, saturday = 0, sunday = 0;
+
+	 		for (var i = 0; i < markers.length; i++) {
+	 			markers[i].setMap(null);
+	 		}
+
+	 		markers = [];
+	 		if(heatmap) heatmap.setMap(null);
+
+	 }
+
+
+
 function reStyleMap(){
 
 	if ((filters.includes('day_checked')
@@ -44,7 +138,42 @@ function reStyleMap(){
 }
 
 
+function addMarker(d, i){
 
+				c++;
+
+				var accidentLatlng = new google.maps.LatLng(d.LATITUDE, d.LONGITUDE);
+				var txt = makeInfoWindowContent(d);
+
+				var icon = chooseIcon(d);
+
+				if (viz != 8) {
+					var marker = markers[total_deaths];
+					marker = new google.maps.Marker({
+		    		position: accidentLatlng,
+						icon: icon,
+						map: gmap,
+						animation: google.maps.Animation.DROP,
+					});
+					markers.push(marker);
+					google.maps.event.addListener(marker, 'mouseover', (function(marker, i) {
+
+		 			return function() {
+				 	infoWindow.setContent(makeInfoWindowContent(d));
+				 	infoWindow.open(gmap, marker);
+					}
+
+	})(marker, i));
+
+
+	google.maps.event.addListener(marker, 'mouseout', (function(marker, i) {
+	 return function() {
+			 infoWindow.setContent(makeInfoWindowContent(data[i]));
+			 infoWindow.close(gmap, marker);
+	 }
+	})(marker, i));
+	}
+}
 
 
  function deleteMarkers(){
@@ -62,6 +191,44 @@ function reStyleMap(){
 	 	}
 	 	addLocCross(d, loc)
 	 }
+
+
+
+	 function chooseIcon(d){
+
+	 	var icon = 'img/red_cross.png';
+
+	 	if(viz == 5){
+	 		var dt = d.DATE + " " + d.TIME;
+	 		if(isDay(dt)) {
+	 			icon = 'img/blue_cross.png';
+	 		} else {
+	 			icon = 'img/yellow_cross.png';
+	 		}
+
+	 	} else if (viz == 4){
+	 		if(pedestrians_killed > 0) {
+	 			icon = 'img/pink_cross.png';
+	 		} else if(cyclists_killed > 0) {
+	 			icon = 'img/green_cross.png';
+	 		} else if(motorists_killed > 0) {
+	 			icon = 'img/blue_cross2.png';
+	 		}
+
+	 	} else if (viz == 2) {
+
+	 		icon = 'img/cross.png';
+
+	 	} else if (viz == 3) {
+
+	 		icon = 'img/cross.png';
+
+	 	}
+
+	 	return icon;
+
+	 }
+
 
 
 	var styles = [{"featureType":"water","elementType":"geometry","stylers":[{"color":"#e9e9e9"},{"lightness":67}]},{"featureType":"landscape","elementType":"geometry","stylers":[{"color":"#f5f5f5"},{"lightness":20}]},{"featureType":"road.highway","elementType":"geometry.fill","stylers":[{"color":"#ffffff"},{"lightness":17}]},{"featureType":"road.highway","elementType":"geometry.stroke","stylers":[{"color":"#ffffff"},{"lightness":29},{"weight":0.2}]},{"featureType":"road.arterial","elementType":"geometry","stylers":[{"color":"#ffffff"},{"lightness":18}]},{"featureType":"road.local","elementType":"geometry","stylers":[{"color":"#ffffff"},{"lightness":16}]},{"featureType":"poi","elementType":"geometry","stylers":[{"color":"#f5f5f5"},{"lightness":21}]},{"featureType":"poi.park","elementType":"geometry","stylers":[{"color":"#dedede"},{"lightness":21}]},{"elementType":"labels.text.stroke","stylers":[{"visibility":"on"},{"color":"#ffffff"},{"lightness":16}]},{"elementType":"labels.text.fill","stylers":[{"saturation":36},{"color":"#333333"},{"lightness":40}]},{"elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"featureType":"transit","elementType":"geometry","stylers":[{"color":"#f2f2f2"},{"lightness":19}]},{"featureType":"administrative","elementType":"geometry.fill","stylers":[{"color":"#fefefe"},{"lightness":20}]},{"featureType":"administrative","elementType":"geometry.stroke","stylers":[{"color":"#fefefe"},{"lightness":17},{"weight":1.2}]},{"featureType":"water","elementType":"all","stylers":[{"color":"#46bcec"},{"visibility":"on"}]}]

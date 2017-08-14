@@ -134,32 +134,6 @@ var linecount = 0;
 var day_start = 5;
 var night_start = 18;
 
-var seed = String(Math.random()).split('.')[1]
-var r = random( seed )
-var simplex = new SimplexNoise( r )
-var simplex3 = simplex.noise3D.bind(simplex)
-
-var config = {
-    margin: 0.9,
-    activeLines : 0,
-    line_width: 4,
-    random : random,
-    simplex3 : simplex3,
-    maxAngle : Math.PI * 0.2,
-    lineLength : 5,
-    simplexScale : 0.2,
-    simplexDepthScale : 0.001,
-  }
-
-	var x1 = w/2, y1 = h/2;
-	var x2 = w/2, y2 = h/2;
-
-	var s = rgb(randomInt(255), randomInt(255), randomInt(255));
-	var lines = [];
-	var active_lines = [];
-	var was_hit, hit, curr_line_width;
-	var simplex = new SimplexNoise();
-
 	var total_accidents = 0, total_incidents = 0;
 	var total_injured = 0, total_deaths = 0, total_ok = 0;
 	var total_pedestrians_injured = 0, total_pedestrians_deaths = 0;
@@ -185,23 +159,7 @@ var curve, change;
 var viz = 1;
 var mapLoaded = false;
 var start_date = "";
-var twirl_counter = 0;
 
-function nextTwirlDataPoint(){
-
-		if(data && data.length >0 && twirl_counter < data.length-1) {
-
-			var d = data[twirl_counter];
-
-				addLine(d);
-				active_lines.push(lines);
-				linecount = 2;
-
-				twirl_counter++;
-
-		}
-
-}
 
 function nextDataPoint(d){
 
@@ -377,17 +335,20 @@ function loadData(){
 
 	var month = $('#month').val();
 	var url = "data/ny_collisions_" + month + ".csv";
-
+	$('.loader').each(function(){
+		$(this).show();
+	})
 
 	d3.csv(url, function(_data) {
 
 		data = _data;
 		start_date = "";
+		twirl_counter = 0;
+		ctx2.background(0);
 		filter();
 		nextTwirlDataPoint();
 		$('.holder').removeClass('hidden');
 		$('.loader').each(function(){
-			console.log($(this));
 			$(this).hide();
 		})
 	});
@@ -465,7 +426,6 @@ function updateParticles(){
 
 
 function addNew(n){
-
 	for (var i = 0; i < n; i++) {
 		resetLine();
 	}
@@ -488,20 +448,13 @@ function addLine(d){
 	if (config.line_width > 0.1) config.line_width -=0.004;
 
 	curr_line_width = config.line_width;
-
-	if(isDayFiltered()) {
-		s = rgb(255 - randomInt(100,250));
-	} else {
-		s = rgb(randomInt(100,250));
-	}
+	s = rgb(randomInt(100,250));
 
 }
 
 
 function addCircle(d, num, type){
-
-	//console.log(d);
-
+	``
 		var p = new Particle(d, num, type);
 
 		if(viz == 1 || viz == 4 || viz == 5 || viz == 6) {
@@ -790,342 +743,6 @@ var Particle = function(d, num, type){
 
 
 
-function twirl(){
-
-  if (chance(20)) {
-    change  = simplex.noise3D(x1, y1, tm) * 0.0005;
-  }
-
-  curve += change;
-  tm+= curve;
-
-  x2 = x1, y2 = y1;
-
-  var noise = simplex3(
-    x1 * config.simplexScale,
-    y1 * config.simplexScale,
-    lines.length * config.simplexDepthScale
-  )
-
-  var theta = noise * Math.PI * 2;
-
-  x1 = x1 + Math.cos( tm ) * config.lineLength;
-  y1 = y1 + Math.sin( tm ) * config.lineLength
-
-  // if (x1>w) twirl();
-  // if (x1<0) twirl();
-  // if (y1>h) twirl();
-  // if (y1<0) twirl();
-
-	curr_line_width = 5 * Math.sin(linecount/60);
-
-	linecount++;
-  ctx2.lineWidth = curr_line_width;
-  ctx2.strokeStyle = s;
-
-  if (!checkHit()) {
-		//if (!selfHit()){
-  	ctx2.line(x1, y1, x2, y2);;
-  	var l = {
-    	x: x1, y: y1
-  	}
-  	lines.push(l);
-		//}
-  }
-
-	var d = data[twirl_counter];
-	updateTwirlUI(d);
-}
-
-
-function chooseIcon(d){
-
-	var icon = 'img/red_cross.png';
-
-	if(viz == 5){
-		var dt = d.DATE + " " + d.TIME;
-		if(isDay(dt)) {
-			icon = 'img/blue_cross.png';
-		} else {
-			icon = 'img/yellow_cross.png';
-		}
-
-	} else if (viz == 4){
-		if(pedestrians_killed > 0) {
-			icon = 'img/pink_cross.png';
-		} else if(cyclists_killed > 0) {
-			icon = 'img/green_cross.png';
-		} else if(motorists_killed > 0) {
-			icon = 'img/blue_cross2.png';
-		}
-
-	} else if (viz == 2) {
-
-		icon = 'img/cross.png';
-
-	} else if (viz == 3) {
-
-		icon = 'img/cross.png';
-
-	}
-
-	return icon;
-
-}
-
-
-function addMarker(d, i){
-
-				c++;
-
-				var accidentLatlng = new google.maps.LatLng(d.LATITUDE, d.LONGITUDE);
-				var txt = makeInfoWindowContent(d);
-
-				var icon = chooseIcon(d);
-
-				if (viz != 8) {
-					var marker = markers[total_deaths];
-					marker = new google.maps.Marker({
-		    		position: accidentLatlng,
-						icon: icon,
-						map: gmap,
-						animation: google.maps.Animation.DROP,
-					});
-					markers.push(marker);
-					google.maps.event.addListener(marker, 'mouseover', (function(marker, i) {
-
-		 			return function() {
-				 	infoWindow.setContent(makeInfoWindowContent(d));
-				 	infoWindow.open(gmap, marker);
-					}
-
-	})(marker, i));
-
-
-	google.maps.event.addListener(marker, 'mouseout', (function(marker, i) {
-	 return function() {
-			 infoWindow.setContent(makeInfoWindowContent(data[i]));
-			 infoWindow.close(gmap, marker);
-	 }
-	})(marker, i));
-	}
-}
-
-
- $("input[type=checkbox]").change(function(e){
-
-	 var target = e.target.id;
-
-	 if(target == "all_accidents"){
-	 	if($('#all_accidents').is(':checked')) {
-		 	turnAllChecked(true);
-			turnMain(true);
-			turnSubs("injured", true);
-			turnSubs("killed", true);
-			turnDays(true);
-	 } else if(target == "all_accidents" ) {
-		 	turnAllChecked(false);
-		 	turnSubs("injured", false);
-			turnSubs("killed", false);
-			turnMain(false);
-			turnDays(false);
-	 }
-}
-	if(target == "total_injured" && $('#total_injured').is(':checked')) {
-		turnSubs("injured", true);
-	}
-
-	if(target == "total_injured" && !$('#total_injured').is(':checked')) {
-		$('#all_accidents').prop( "checked", false );
-		turnSubs("injured", false);
-	}
-
-	if(target == "total_killed" && $('#total_killed').is(':checked')) {
-		turnSubs("killed", true);
-	}
-
-	if(target == "total_killed" && !$('#total_killed').is(':checked')) {
-		$('#all_accidents').prop( "checked", false );
-		turnSubs("killed", false);
-	}
-
-	if(target == "ok_checked" && $('#ok_checked').is(':checked')) {
-		$('#all_accidents').prop( "checked", true );
-	}
-
-	if(target == "ok_checked" && !$('#ok_checked').is(':checked')) {
-		$('#all_accidents').prop( "checked", false );
-	}
-
-	if((target == "total_injured" || target == "total_killed" || target == "ok_checked") && ($('#total_injured').is(':checked') && $('#total_killed').is(':checked') && $('#ok_checked').is(':checked'))) {
-		$('#all_accidents').prop( "checked", true );
-		turnMain(true);
-		turnSubs("injured", true);
-		turnSubs("killed", true);
-
-	}
-
-	if(target == "pedestrians_checked") {
-
-			if($('#pedestrians_checked').is(':checked')) {
-				$('#pedestrians_injured').prop( "checked", true );
-				$('#pedestrians_killed').prop( "checked", true );
-			} else {
-				$('#pedestrians_injured').prop( "checked", false );
-				$('#pedestrians_killed').prop( "checked", false );
-				turnOffAllChecked();
-			}
-
-	}
-
-	if(target == "pedestrians_injured" || target == "pedestrians_killed"){
-
-			if ($('#pedestrians_injured').is(':checked') && $('#pedestrians_killed').is(':checked') ){
-				$('#pedestrians_checked').prop( "checked", true );
-		} else if( !$('#pedestrians_injured').is(':checked') || !$('#pedestrians_killed').is(':checked')) {
-				$('#pedestrians_checked').prop( "checked", false );
-				turnOffAllChecked()
-		}
-	}
-
-
-
-if(target == "cyclists_checked") {
-
-		if($('#cyclists_checked').is(':checked')) {
-			$('#cyclists_injured').prop( "checked", true );
-			$('#cyclists_killed').prop( "checked", true );
-		} else {
-			$('#cyclists_injured').prop( "checked", false );
-			$('#cyclists_killed').prop( "checked", false );
-			turnOffAllChecked();
-		}
-
-}
-
-if(target == "cyclists_injured" || target == "cyclists_killed"){
-
-		if ($('#cyclists_injured').is(':checked') && $('#cyclists_killed').is(':checked') ){
-			$('#cyclists_checked').prop( "checked", true );
-	} else if( !$('#cyclists_injured').is(':checked') || !$('#cyclists_killed').is(':checked')) {
-			$('#cyclists_checked').prop( "checked", false );
-			turnOffAllChecked()
-	}
-}
-
-
-if(target == "motorists_checked") {
-
-		if($('#motorists_checked').is(':checked')) {
-			$('#motorists_injured').prop( "checked", true );
-			$('#motorists_killed').prop( "checked", true );
-		} else {
-			$('#motorists_injured').prop( "checked", false );
-			$('#motorists_killed').prop( "checked", false );
-			turnOffAllChecked();
-
-		}
-
-}
-
-if(target == "motorists_injured" || target == "motorists_killed"){
-
-		if ($('#motorists_injured').is(':checked') && $('#motorists_killed').is(':checked') ){
-			$('#motorists_checked').prop( "checked", true );
-	} else if( !$('#motorists_injured').is(':checked') || !$('#motorists_killed').is(':checked')) {
-			$('#motorists_checked').prop( "checked", false );
-			turnOffAllChecked()
-	}
-}
-
-
-
-	if(target == "days_checked") {
-
-			if($('#days_checked').is(':checked')) {
-				turnDays(true);
-			} else {
-				turnDays(false);
-			}
-
-	}
-
-
-	if(target == "mon_check" || target == "tues_check" || target == "wed_check" || target == "thurs_check" || target == "fri_check" || target == "sat_check" || target == "sun_check"){
-
-		if ($('#mon_check').is(':checked') && $('#tues_check').is(':checked') && $('#wed_check').is(':checked') && $('#thurs_check').is(':checked') && $('#fri_check').is(':checked') && $('#sat_check').is(':checked') && $('#sun_check').is(':checked') ){
-				$('#days_checked').prop( "checked", true );
-		} else if (!$('#mon_check').is(':checked') || !$('#tues_check').is(':checked') || !$('#wed_check').is(':checked') || !$('#thurs_check').is(':checked') || !$('#fri_check').is(':checked') || !$('#sat_check').is(':checked') || !$('#sun_check').is(':checked') ){
-			$('#days_checked').prop( "checked", false );
-			turnOffAllChecked()
-		}
-}
-
-	if($('#pedestrians_checked').is(':checked') && $('#cyclists_checked').is(':checked') && $('#motorists_checked').is(':checked') && $('#days_checked').is(':checked')  ) {
-		$('#all_accidents').prop( "checked", true );
-		turnAllChecked(true)
-	}
-
-	 filter();
- })
-
-
-
-
-function selfHit(){
-
-  if (lines.length > 0) {
-
-    for (var i = 1; i < lines.length; i++) {
-
-      hit = checkIntersection(x1, y1, x2, y2, lines[i].x, lines[i].y, lines[i-1].x, lines[i-1].y );
-
-      if (hit!= undefined && hit!= false) {
-        //resetLine();
-				//twirl();
-				//console.log("twirl");
-				return true;
-        //break;
-      }
-  }
-
-  }
-}
-
-
-
-
-
-function checkHit(){
-    var is_hit = false;
-    //if (active_lines.length > 0) {
-    for (var j = 0; j < active_lines.length; j++) {
-
-			var lines2 = active_lines[j];
-
-			if (lines2.length > 0) {
-
-				for (var i = 1; i < lines2.length; i++) {
-
-      		hit = checkIntersection(x1, y1, x2, y2, lines2[i].x, lines2[i].y, 		lines2[i-1].x, lines2[i-1].y );
-
-      		if (hit!= undefined && hit!= false) {
-						nextTwirlDataPoint();
-        		//resetLine();
-        		return true;
-        		//break;
-      		}
-
-				}
-
-  	}
-}
-
-return is_hit;
-
-}
-
-
 
 
 function addHeatmap(){
@@ -1386,74 +1003,6 @@ function makeInfoWindowContent(d){
 ;
 }
 
-
-	 window.onload = function(){
-
-	 	var location = {
-	         "lat": 40.7090,
-	         "lng": -73.85
-	     };
-
-	 	var myLatlng = new google.maps.LatLng(location.lat, location.lng);
-
-	 	var mapOptions = {
-	 		zoom: 11,
-	 		styles: dark,
-	 		center: myLatlng,
-	 		mapTypeId: google.maps.MapTypeId.ROAD,
-	 		disableDefaultUI: false,
-	 		scrollwheel: false,
-	 		draggable: true,
-	 		navigationControl: false,
-	 		mapTypeControl: false,
-	 		scaleControl: true,
-	 		streetViewControl: false,
-	 		zoomControl: true,
-	 		zoomControlOptions: {
-	          position: google.maps.ControlPosition.LEFT_BOTTOM
-	     },
-	 		disableDoubleClickZoom: false
-	 	};
-
-	 	gmap = new google.maps.Map(document.getElementById("map"), mapOptions);
-
-	 	// initialize the canvasLayer
-	 	var canvasLayerOptions = {
-	 		map: gmap,
-	 		resizeHandler: resize,
-	 		animate: true,
-	 		updateHandler: draw,
-	 		resolutionScale: resolutionScale
-	 	};
-
-	 	canvasLayer = new CanvasLayer(canvasLayerOptions);
-	 	ctx = canvasLayer.canvas.getContext('2d');
-
-	 	ctx.font = "18px Monospace";
-	 	ctx.textAlign = "center";
-	 	ctx.moveTo(w/2, h/2);
-	 	ctx.beginPath();
-	 	ctx.lineCap = 'round';
-	 	ctx.lineWidth = 2;
-
-	 	google.maps.event.addListener(gmap, "drag", function(){
-	 		if(viz !=4) resetMap();
-	 	});
-
-	 	google.maps.event.addListener(gmap, "zoom_changed", function(){
-	 		if(viz !=4) resetMap();
-	 	});
-
-	 	google.maps.event.addListenerOnce(gmap, "idle", function(){
-
-	 		mapLoaded = true;
-	 		ctx.clearRect(0, 0, w, h);
-
-	 		loadData();
-
-	 });
-
-	 };
 
 
 
