@@ -1719,5 +1719,5 @@ function loadScript(url, callback) {
 
 
 
-loadScript('../js/fx.js');
-loadScript('../js/utils.js');
+loadScript('js/fx.js');
+loadScript('js/utils.js');
