@@ -835,32 +835,32 @@ function twirl(){
 
 function chooseIcon(d){
 
-	var icon = '../img/red_cross.png';
+	var icon = 'img/red_cross.png';
 
 	if(viz == 5){
 		var dt = d.DATE + " " + d.TIME;
 		if(isDay(dt)) {
-			icon = '../img/blue_cross.png';
+			icon = 'img/blue_cross.png';
 		} else {
-			icon = '../img/yellow_cross.png';
+			icon = 'img/yellow_cross.png';
 		}
 
 	} else if (viz == 4){
 		if(pedestrians_killed > 0) {
-			icon = '../img/pink_cross.png';
+			icon = 'img/pink_cross.png';
 		} else if(cyclists_killed > 0) {
-			icon = '../img/green_cross.png';
+			icon = 'img/green_cross.png';
 		} else if(motorists_killed > 0) {
-			icon = '../img/blue_cross2.png';
+			icon = 'img/blue_cross2.png';
 		}
 
 	} else if (viz == 2) {
 
-		icon = '../img/cross.png';
+		icon = 'img/cross.png';
 
 	} else if (viz == 3) {
 
-		icon = '../img/cross.png';
+		icon = 'img/cross.png';
 
 	}
 
