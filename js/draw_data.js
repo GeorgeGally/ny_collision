@@ -178,25 +178,6 @@ var config = {
 	var gmap, heatmap, canvasLayer;
 	var heatmap, data;
 
-// STYLE GENERAL POI WINDOW
-
-  var infoWindow = new InfoBubble({
-      minHeight: 120,
-      minWidth: 300,
-      hideCloseButton: true,
-      disableAutoPan: true,
-      disableAnimation: true,
-      backgroundColor: '#fff',
-      borderRadius: 12,
-      padding: 8,
-      arrowSize: 10,
-      borderWidth: 1,
-      borderColor: '#ddd',
-      maxWidth: 400
-  }), d;
-
-var markers = [];
-var infowindows = [];
 
 var tm = 0;
 var count = 0;
@@ -223,8 +204,9 @@ function nextTwirlDataPoint(){
 }
 
 function nextDataPoint(d){
-		//console.log("nextDataPoint");
+
 		//console.log(d);
+
 		c = 0;
 		var total = 0;
 		updateUI(d, 'date_holder');
@@ -292,9 +274,6 @@ function nextDataPoint(d){
 			total_deaths += killed;
 			total_injured += injured;
 
-			//var totals = motorist + cyclist + pedestrian;
-			//console.log(filters);
-
 			if(filters.includes('motorists_checked') && motorists_killed > 0) {
 				total += motorists_killed;
 				addMarker(d, counter);
@@ -341,19 +320,13 @@ function nextDataPoint(d){
 
 		}
 
-		//else {
-		//resetLine();
-		//}
-
 	}
 
 	function addViz(d, num, type){
 
 		if(viz == 2) {
 			addHeatMapData(d, num)
-		// } else if(viz == 1) {
-		// 	addLine(d);
-	} else if(viz == 1 || viz == 3 || viz == 4 || viz == 5 || viz == 6){
+		} else {
 			addCircle(d, num, type);
 		}
 
@@ -396,11 +369,6 @@ function nextDataPoint(d){
 			nextDataPoint(data[counter]);
 			counter++;
 
-			//if(viz == 1) {
-				//active_lines.push(lines);
-				//linecount = 15;
-			//}
-
 		}
 	}
 
@@ -408,16 +376,14 @@ function nextDataPoint(d){
 function loadData(){
 
 	var month = $('#month').val();
-	var url = "../data/ny_collisions_" + month + ".csv";
-	//console.log(url);
+	var url = "data/ny_collisions_" + month + ".csv";
+
 
 	d3.csv(url, function(_data) {
 
 		data = _data;
-		//data.reverse();
 		start_date = "";
 		filter();
-		//resetLine();
 		nextTwirlDataPoint();
 	});
 

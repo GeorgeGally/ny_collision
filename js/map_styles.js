@@ -1,3 +1,25 @@
+
+// STYLE GENERAL POI WINDOW
+
+  var infoWindow = new InfoBubble({
+      minHeight: 120,
+      minWidth: 300,
+      hideCloseButton: true,
+      disableAutoPan: true,
+      disableAnimation: true,
+      backgroundColor: '#fff',
+      borderRadius: 12,
+      padding: 8,
+      arrowSize: 10,
+      borderWidth: 1,
+      borderColor: '#ddd',
+      maxWidth: 400
+  }), d;
+
+var markers = [];
+var infowindows = [];
+
+
 function reStyleMap(){
 
 	if ((filters.includes('day_checked')
