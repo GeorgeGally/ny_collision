@@ -1,0 +1,326 @@
+
+<html>
+
+<head>
+
+<meta charset="utf-8">
+<title>NY Traffic Accident Visualised - George Gally</title>
+<meta name="description" content="">
+<meta name="author" content="">
+
+<!-- Mobile Specific Metas
+================================================== -->
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<!-- CSS
+================================================== -->
+<link rel="stylesheet" href="../css/reset.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="css/skeleton.css">
+<link rel="stylesheet" href="../css/style.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="../css/jquery.fullpage.min.css" type="text/css" media="screen" />
+<link href="https://fonts.googleapis.com/css?family=Lobster|Raleway|Abril+Fatface" rel="stylesheet">
+
+	<script src="js/jquery-1.10.1.min.js"></script>
+	<script src="js/creative_coding.js"></script>
+	<script src="js/utils.js"></script>
+	<script type="text/javascript" src="http://maps.google.com/maps/api/js?key=AIzaSyDEKAnXP_v0EOZxJ5bv0K4UNqYFRM1JAj0&libraries=visualization"></script>
+
+	<script language="javascript" src="js/canvas.js"></script>
+	<script language="javascript" src="js/d3.js"></script>
+	<script language="javascript" src="js/simplex-noise.js"></script>
+	<script src="../js/CanvasLayer.js"></script>
+	<script src="../js/infobubble.js"></script>
+	<script src="../js/map_styles.js"></script>
+	<script type="text/javascript" src="js/jquery.fullpage.min.js"></script>
+
+	<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+</head>
+
+<body>
+
+<div id="fullpage" style="">
+
+	<div class="section" id="page1" style="background: #fff; height: 100%;">
+
+		<div class="half-bottom" style="position: relative; top: 0; background: #fff; z-index: 4; margin: 0; padding: 0; width: 100%; display: block;">
+
+			<div class="add-bottom" style="text-align: center; width: 80%; padding-left: 10%; ">
+
+					<h1 class="add-bottom half-top" style="color: #000; padding-top: 0px; padding-bottom: 60px;">
+						A month of <br>New York Traffic <br>Accidents
+					</h1>
+
+			</div>
+
+		</div>
+
+		<div style="0 auto 0 auto; width: 80%; margin: 0 auto 0 auto;">
+
+
+		<div class="half-bottom" style="width: 32%; margin: 0 1% 0 17%; display: inline-block; float: left; font-family: 'Open Sans', sans-serif;">
+
+				There's more than 20 000 motor vehicle accidents in New York every month, leaving a dozen dead and over 2000 injured. <br><br>
+				That's around an accident every 30 seconds, and one every 600 yards of road. In 10 years, once most vehicles are autonomous, we'll look back at this time as utter madness. <br>
+
+
+
+		</div>
+
+		<div class="half-bottom" style="width: 32%; margin: 0 17% 0 1%; ; display: inline-block; font-family: 'Open Sans', sans-serif; ">
+				I wanted to take a snapshop of this and use the data and create something beautiful to jutapose these underlying horific statistics. <br>
+				The twirls represent resonance - that these accidents effect people and families beyond just that moment.
+				However, I also didn't want to trivilize the data, so there's an number of other visualisations included to explore.
+				 <br><br>
+
+		</div>
+
+</div>
+
+		<div style = "width: 100%" class="sub add-top">
+
+			<a href="https://www.instagram.com/radarboy3000/">@radarboy3000</a>
+			<br>
+			<br>
+		</div>
+
+</div>
+
+
+<div id="page2" class="section" style="height: 100%; display: block;">
+
+	<div style="width: 100%; height: 100%; position: relative; z-index: 5;">
+	<div id="twirl_date_holder" class="date_holder"></div>
+
+	<canvas id="canvas2"></canvas>
+
+	</div>
+
+</div>
+
+<div id="page3" class="section" style="width: 100%; height: 100%; position: relative;">
+
+	<div id="viz_date_holder" class="date_holder"></div>
+
+
+	<div id="map"></div>
+
+	<div class="holder">
+
+	 	<a class="close">×</a> <br><br>
+
+		<h2>Month: </h2>
+
+		<select id="month" name="select" onchange="loadData()">
+
+			<option value="jan_2017">January 2017</option>
+			<option value="feb_2017">February 2017</option>
+			<option value="march_2017">March 2017</option>
+			<option value="april_2017">April 2017</option>
+			<option value="may_2017">May 2017</option>
+			<option value="june_2017">June 2017</option>
+			<option value="july_2017" selected>July 2017</option>
+
+		</select>
+
+		<h2 class = "add-top">Viz Type: </h2>
+
+			<select id="viz_type" name="select" onchange="filter()">
+				<option value="1">Density</option>
+				<option value="2">HeatMap</option>
+				<option value="3" selected>Ok/Not Ok</option>
+				<option value="4">Most Dangerous Places</option>
+				<option value="5">Day vs Night</option>
+				<option value="6">Most Dangerous Day</option>
+
+			</select>
+
+	 <br><br>
+
+	 <h2 class = "add-top">Filter: </h2>
+
+	 <div id="all" class="highlight half-bottom">
+
+			<label>
+				<input type="checkbox" checked id="all_accidents">
+				<span class="total"><h3>All Accidents: <span class="count">0 </h3></span><br>
+			</label>
+
+			<label>
+				&nbsp;  <input type="checkbox" checked id="total_injured">
+				<span class="injured"> <span class="bullet">&bullet;</span>
+				<span class="count">0 </span> Injured </span>
+			</label><br>
+
+			<label>
+				&nbsp; <span class="killed"><input type="checkbox" checked id="total_killed">
+				<span class="bullet">&bullet;</span>
+				<span class="count">0 </span> Killed </span>
+			</label><br>
+
+			<label>
+				&nbsp;  <span class="ok"><input type="checkbox" checked id="ok_checked">
+				<span class="bullet">&bullet;</span>
+				<span class="count">0 </span>  OK </span>
+			</label><br>
+
+		</div>
+
+		<div id="pedestrians" class = "half-bottom">
+
+			<label>
+				<input type="checkbox" checked id="pedestrians_checked">
+				<h3>Pedestrians</h3>
+			</label><br>
+
+			<label>
+				&nbsp; <span class="injured">
+					<!-- <input type="checkbox" checked id="pedestrians_injured"> -->
+				<span class="bullet">&bullet;</span>
+				<span class="count">0 </span> Injured </span>
+			</label><br>
+
+			<label>
+				&nbsp; <span class="killed">
+					<!-- <input type="checkbox" checked id="pedestrians_killed"> -->
+				<span class="bullet">&bullet;</span>
+				<span class="count">0 </span> Killed </span>
+			</label><br>
+
+		</div>
+
+		<div id="cyclists"  class="half-bottom">
+
+			<label>
+				<input type="checkbox" checked id="cyclists_checked">
+				<h3>Cyclists</h3>
+			</label><br>
+
+			<label>
+				&nbsp; <span class="injured">
+					<!-- <input type="checkbox" checked id="cyclists_injured">    -->
+					<span class="bullet">&bullet;</span>
+				<span class="count">0 </span> Injured </span>
+			</label><br>
+
+			<label>
+				&nbsp; <span class="killed">
+					<!-- <input type="checkbox" checked id="cyclists_killed"> -->
+				<span class="bullet">&bullet;</span>
+				<span class="count">0 </span> Killed </span>
+			</label><br>
+
+		</div>
+
+		<div id="motorists"  class = "half-bottom">
+
+		<label>
+			<input type="checkbox" checked id="motorists_checked">
+			<h3>Motorists</h3>
+		</label><br>
+
+		<label>
+			&nbsp; <span class="injured">
+				<!-- <input type="checkbox" checked id="motorists_injured">   -->
+				<span class="bullet">&bullet;</span>
+			<span class="count">0 </span> Injured </span>
+		</label><br>
+
+		<label>
+			&nbsp; <span class="killed">
+				<!-- <input type="checkbox" checked id="motorists_killed"> -->
+			<span class="bullet">&bullet;</span>
+			<span class="count">0 </span> Killed</span>
+		</label><br>
+
+	</div>
+
+		<div id='days'>
+
+		<label>
+			<input type="checkbox" checked id="days_checked"> <h3>All Time</h3>
+		</label><br>
+
+		<label>
+			<span class="day">
+			&nbsp; <input type="checkbox" checked id="day_checked"> <span class="bullet">&bullet;</span>
+			Day (6am - 6pm)</span>
+		</label><br>
+
+		<label>
+			<span class="night">
+			&nbsp; <input type="checkbox" checked id="night_checked"> <span class="bullet">&bullet;</span>
+			Night (6pm - 6am)
+			</span>
+		</label><br>
+
+		<label>
+		<span class="mon">
+			&nbsp; <input type="checkbox" checked id="mon_check">
+			<span class="bullet">&bullet;</span>
+			1. Mon: <span class="count">0</span>
+			</span>
+		</label><br>
+
+		<label>
+			<span class="tues">
+			&nbsp; <input type="checkbox" checked id="tues_check">
+			<span class="bullet">&bullet;</span>
+			2. Tues: <span class="count">0</span>
+			</span>
+		</label><br>
+
+		<label>
+			<span class="wed">
+			&nbsp; <input type="checkbox" checked id="wed_check">
+			<span class="bullet">&bullet;</span>
+			3. Wed: <span class="count">0</span>
+			</span>
+		</label><br>
+
+		<label>
+			<span class="thurs">
+			&nbsp; <input type="checkbox" checked id="thurs_check">
+			<span class="bullet">&bullet;</span>
+			4. Thurs: <span class="count">0</span>
+			</span>
+		</label><br>
+
+		<label>
+			<span class="fri">
+			&nbsp; <input type="checkbox" checked id="fri_check">
+			<span class="bullet">&bullet;</span>
+			5. Fri: <span class="count">0</span>
+			</span>
+		</label><br>
+
+		<label>
+			<span class="sat">
+			&nbsp; <input type="checkbox" checked id="sat_check">
+			<span class="bullet">&bullet;</span>
+			6. Sat: <span class="count">0</span>
+			</span>
+		</label><br>
+
+		<label>
+			<span class="sun">
+			&nbsp; <input type="checkbox" checked id="sun_check">
+			<span class="bullet">&bullet;</span>
+			7. Sun: <span class="count">0</span>
+			</span>
+		</label><br>
+
+	</div>
+
+	</div>
+
+
+</div>
+</div>
+
+</div>
+<script src="js/draw_data.js"></script>
+
+</body>
+</html>

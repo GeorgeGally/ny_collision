@@ -1,0 +1,256 @@
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font: inherit;
+  font-size: 100%;
+  vertical-align: baseline;
+}
+
+
+
+
+html {
+  line-height: 1;
+}
+
+ol, ul {
+  list-style: none;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+caption, th, td {
+  text-align: left;
+  font-weight: normal;
+  vertical-align: middle;
+}
+
+q, blockquote {
+  quotes: none;
+}
+q:before, q:after, blockquote:before, blockquote:after {
+  content: "";
+  content: none;
+}
+
+a img {
+  border: none;
+}
+
+a, a:visited { color: #000; text-decoration: none; }
+a:hover {
+  color: red;
+}
+
+article, aside, details, figcaption, figure, footer, header, hgroup, main, menu, nav, section, summary {
+  display: block;
+}
+
+html, body {
+  margin: 0;
+  height: 100%;
+  line-height: 22px;
+   font-size: 16px;
+  overflow-x: hidden;
+  color: #333;
+  background: #000;
+  font-family: Arial, helvetica;
+}
+
+b { font-weight: 600; color: #ddd; }
+
+.add-top { margin-top: 20px !important; }
+.half-top { margin-top: 10px !important; }
+.add-bottom { margin-bottom: 20px !important; }
+.half-bottom { margin-bottom: 10px !important; }
+
+canvas, #map {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background-size: cover;
+  z-index: 0;
+}
+
+
+.info_content { font-size: 15px; }
+.info_content h3 { font-weight: bold; }
+.info_content h4 { font-style: italic; }
+
+.info_date {
+	background: #000;
+	color: #fff;
+	padding: 0 4px 2px 4px;
+	display: inline-block;
+	margin-bottom: 4px;
+}
+
+canvas {
+	pointer-events:none;
+	position: absolute;
+}
+
+.highlight {
+ color: #9fc8f0;
+}
+
+.bullet {
+	color: #333;
+	vertical-align: middle;
+	padding-left: 1px;
+	font-size: 32px;
+}
+
+.bullet.active{
+	color: red;
+}
+
+.ok .bullet.active{
+	color: green;
+}
+
+.injured .bullet.active{
+	color: orange;
+}
+
+#days .night .bullet.active{
+	color: yellow;
+}
+#days .day .bullet.active{
+	color: #00aef0;
+}
+
+
+
+#pedestrians .bullet.active{
+	color: #e4a478;
+}
+
+#cyclists .bullet.active{
+	color: #b8d072;
+}
+
+#motorists .bullet.active{
+	color: #496b8e;
+}
+
+#days .bullet.active{
+	color: #9fc8f0;
+}
+
+h1 {
+
+  font-family: 'Abril Fatface', Georgia, Times;
+  color: #000; font-weight: 400; padding-top: 10px; font-size: 75px; line-height: 80px;}
+
+h2 {
+  font-size: 18px; font-weight: 400;
+  margin-bottom: 12px;
+}
+
+h3 { font-weight: 800; padding-bottom: 15px; display: inline; line-height: 24px;}
+
+.sub {
+  font-family: 'Abril Fatface', cursive;
+  font-size: 18px;
+  text-align: center;
+  padding-top: 20px;
+}
+
+.holder {
+	width: 280px;
+	font-weight: 100;
+	position: absolute;
+	z-index: 1; top: 0px; right: 0px;
+	background: rgba(0,0,0,0.8); color: #fff;
+	padding: 0px 0px 0 50px;
+	line-height: 14px;
+	font-size: 14px;
+	height: 100%;
+	transition-property: all;
+	transition-duration: .5s;
+	transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+}
+
+.holder.hidden {
+	right: -295px;
+	background: rgba(255,255,255,0.1); color: #000;
+}
+
+.holder.day {
+	background: rgba(255,255,255,0.8); color: #000;
+	border: 1px #eee solid;
+}
+
+.close {
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 20px;
+  font-weight: bold;
+  line-height: 18px;
+  color: #fff;
+  text-shadow: 0 1px 0 #333;
+  opacity: 0.6;
+  filter: alpha(opacity=60);
+  text-decoration: none;
+	float: left;
+	margin: 10px 0 10px -40px;
+}
+
+.close:hover {
+  color: #eee;
+  text-decoration: none;
+  opacity: 0.4;
+  filter: alpha(opacity=40);
+  cursor: pointer;
+}
+
+.bold {
+	font-weight: 600;
+}
+
+#headline {
+	position: absolute;
+  bottom: 0px; left: 0px;
+  padding: 5px 0 5px 20px;
+	width: 100%;
+  color: #777;
+  z-index: 4;
+  height: 80px;
+  background: #fff;
+}
+
+.date_holder, .date_holder2 {
+	color: #777;
+	margin-top: 9px;
+	font-size: 16px;
+	line-height: 20px;
+  position: absolute;
+  top: 30px;
+  left: 40px;
+  z-index: 4;
+  background: #000;
+  padding: 12px;
+  width: 300px;
+}
+
+.daytime {
+	color: #000;
+}
