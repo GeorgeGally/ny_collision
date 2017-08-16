@@ -124,7 +124,7 @@ function reStyleMap(){
 		$('.holder').removeClass('day');
 		$('#headline h1').removeClass('daytime');
 		gmap.setOptions({styles: dark});
-	} else if (isDayFiltered()){
+	} else if (isDayOn()){
 		gmap.setOptions({styles: light});
 		$('#headline h1').addClass('daytime');
 	 	//$('.holder').addClass('day');
@@ -135,6 +135,24 @@ function reStyleMap(){
 	}
 
 
+}
+
+
+
+function addHeatmap(){
+	console.log("addHeatmap");
+
+	heatmapData = new google.maps.MVCArray();
+	heatmap = new google.maps.visualization.HeatmapLayer({
+			data: heatmapData,
+			opacity: 0.6,
+			dissipating: true,
+			maxIntensity: 140,
+			radius: 40,
+			gradient: gradient
+	});
+
+	heatmap.setMap(gmap);
 }
 
 
@@ -173,6 +191,73 @@ function addMarker(d, i){
 	 }
 	})(marker, i));
 	}
+}
+
+
+
+
+
+function makeInfoWindowContent(d){
+
+	var dt = getDateTime(d);
+
+	var txt = '<div class="info_content" class="text-center">';
+	txt += "<div class='info_date'>" + dt + "</div><br>";
+	txt += "<h3>"
+	if(d['BOROUGH'] != "") txt += d.BOROUGH;
+	if(d['CROSS STREET NAME'] != "") txt += ": " + d['CROSS STREET NAME'];
+	txt +="</h3>";
+
+
+	txt += "<div class='info_injuries half-top'>";
+
+	txt += "<span style='color: #496b8e'>";
+	if(d['NUMBER OF PEDESTRIANS INJURED'] != undefined && parseInt(d['NUMBER OF PEDESTRIANS INJURED']) != 0) {
+		txt += "Cyclists Injured: " + d['NUMBER OF PEDESTRIANS INJURED'] + " ";
+	}
+
+	if(d['NUMBER OF PEDESTRIANS KILLED'] != undefined && parseInt(d['NUMBER OF PEDESTRIANS KILLED']) != 0) {
+		txt += "Pedestrians Killed: " + d['NUMBER OF PEDESTRIANS KILLED'] + "<br>";
+	}
+	txt += "</span>";
+
+	txt += "<span style='color: #496b8e'>";
+
+	if(d['NUMBER OF CYCLIST INJURED'] != undefined && parseInt(d['NUMBER OF CYCLIST INJURED']) != 0) {
+		txt += "Cyclists Injured: " + d['NUMBER OF CYCLIST INJURED'] + " ";
+	}
+
+	if(d['NUMBER OF CYCLIST KILLED'] != undefined && parseInt(d['NUMBER OF CYCLIST KILLED']) != 0) {
+		txt += "Cyclists Killed: " +d['NUMBER OF CYCLIST KILLED'] + "<br>";
+	}
+	txt += "</span>";
+
+	txt += "<span style='color: #496b8e'>";
+
+	if(d['NUMBER OF MOTORIST INJURED'] != undefined && parseInt(d['NUMBER OF MOTORIST INJURED']) != 0) {
+		txt += "Motorists Injured: " +d['NUMBER OF MOTORIST INJURED'] + " ";
+	}
+
+	if(d['NUMBER OF MOTORIST KILLED'] != undefined && parseInt(d['NUMBER OF MOTORIST KILLED']) != 0) {
+		txt += "Motorists Killed: " + d['NUMBER OF MOTORIST KILLED'] + "<br>";
+	}
+	txt += "</span>";
+
+
+
+	if(d["CONTRIBUTING FACTOR VEHICLE 1"] != "" && d["CONTRIBUTING FACTOR VEHICLE 2"] != "") {
+		txt +="<h4>Contributing Factors: ";
+		if(d["CONTRIBUTING FACTOR VEHICLE 1"] != "" && d["CONTRIBUTING FACTOR VEHICLE 1"] != "Unspecified") txt += d["CONTRIBUTING FACTOR VEHICLE 1"] + " ";
+		if(d["CONTRIBUTING FACTOR VEHICLE 2"] != "" && d["CONTRIBUTING FACTOR VEHICLE 2"] != "Unspecified") txt += d["CONTRIBUTING FACTOR VEHICLE 2"] + " ";
+		if(d["CONTRIBUTING FACTOR VEHICLE 3"] != "" && d["CONTRIBUTING FACTOR VEHICLE 3"] != "Unspecified") txt += d["CONTRIBUTING FACTOR VEHICLE 3"] + " ";
+		txt +="</h4>";
+	}
+
+
+	txt +='</div>';
+
+	return txt;
+;
 }
 
 

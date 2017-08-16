@@ -20,6 +20,8 @@ return weekday[d.getDay()];
 }
 
 
+
+
 function getDate(dt, clock){
 
   var clock = clock || false;
@@ -47,6 +49,11 @@ function getDate(dt, clock){
 
 }
 
+function getDateTime(d){
+  return getDate(d.TIME + " " + d.DATE, 1);
+}
+
+
 function getDay(d){
   var weekday = [];
   weekday[0] =  "Sunday";
@@ -69,6 +76,15 @@ function isDay(dt){
   return (hour >= 5 && hour < 19);
 
 }
+
+function getDayType(dt){
+	if(isDay(dt)) {
+		return day_type = "day";
+	} else {
+		return day_type = "night";
+	}
+}
+
 
 var monthNames = [
     "January", "February", "March",

@@ -12,7 +12,7 @@ frameRate = 120;
 var tt = "all";
 
 var particles = [];
-
+var page = 1;
 // var colours2 = new colourPool()
 // 	    .add("#b8d072")
 //       .add("#f2de6b")
@@ -71,24 +71,24 @@ var colours = new colourPool()
 			.add("#861D47")
 
 	// 	// pinks
-	var colours2 = new colourPool()
-				.add("#83AF9B")
-				.add("#FE4365")
-				.add("#C8C8A9")
-				.add("#FC9D9A")
-				.add("#F9CDAD")
-				.add("#FE4365")
-				.add('#FC9D9A')
+	// var colours2 = new colourPool()
+	// 			.add("#83AF9B")
+	// 			.add("#FE4365")
+	// 			.add("#C8C8A9")
+	// 			.add("#FC9D9A")
+	// 			.add("#F9CDAD")
+	// 			.add("#FE4365")
+	// 			.add('#FC9D9A')
 				//.add('#F9CDAD')
 
-			// var colours2 = new colourPool()
-			// 			.add("#ccc")
-			// 	    .add("#E0E4CC")
-			//       .add("#C8C8A9")
-			// 			.add('#83AF9B')
-			// 			.add("#A7DBD8")
-			// 			.add("#84D3ED")
-			// 			.add('#496b8e')
+	var colours2 = new colourPool()
+		.add("#ccc")
+		.add("#E0E4CC")
+		.add("#C8C8A9")
+		.add('#83AF9B')
+		.add("#A7DBD8")
+		.add("#84D3ED")
+		.add('#496b8e')
 
 			// var colours2 = new colourPool()
 			// 			.add("#ccc")
@@ -130,9 +130,8 @@ var t = "any";
 var f = "all";
 
 var heatmapData = [];
-var linecount = 0;
-var day_start = 5;
-var night_start = 18;
+var end_date = "";
+var headline_array = ['Collision Density', 'Heatmap', 'Injuries &amp; Close Calls', 'Most Dangerous Places for Pedestrians, Cyclists &amp; Motorists', 'Day vs Night', 'Most Dangerous Day of the Week'];
 
 	var total_accidents = 0, total_incidents = 0;
 	var total_injured = 0, total_deaths = 0, total_ok = 0;
@@ -163,7 +162,9 @@ var start_date = "";
 
 function nextDataPoint(d){
 
-		//console.log(d);
+	if(data.length >0 && counter < data.length-1) {
+
+		var d = data[counter];
 
 		c = 0;
 		var total = 0;
@@ -277,8 +278,9 @@ function nextDataPoint(d){
 			}
 
 		}
-
+		counter++;
 	}
+}
 
 	function addViz(d, num, type){
 
@@ -319,16 +321,6 @@ function nextDataPoint(d){
 		}
 	}
 
-	function resetLine(){
-
-		if(data.length >0 && counter < data.length-1) {
-
-			var d = data[counter];
-			nextDataPoint(data[counter]);
-			counter++;
-
-		}
-	}
 
 
 function loadData(){
@@ -343,7 +335,9 @@ function loadData(){
 
 		data = _data;
 		start_date = "";
-		twirl_counter = 0;
+		var d = data[data.length-1];
+		end_date = getDateTime(d);
+		twirl_counter = -1;
 		ctx2.background(0);
 		filter();
 		nextTwirlDataPoint();
@@ -357,6 +351,7 @@ function loadData(){
 
 function filter() {
 
+	console.log("filter");
 
 	viz = $('#viz_type').val();
 
@@ -377,7 +372,7 @@ function filter() {
 		deleteMarkers();
 
 		if(viz == 2) addHeatmap();
-		resetLine();
+		nextDataPoint();
 
 	}
 }
@@ -392,6 +387,7 @@ function draw() {
 			twirl();
 			twirl();
 			drawGraph();
+			//nextTwirlDataPoint();
 			}
 			if (page == 3) {
 				ctx.clearRect(0, 0, w, h);
@@ -405,14 +401,16 @@ function draw() {
 
 function updateParticles(){
 
-	if(viz == 6) {
-		addNew(8)
-	} else if (viz == 3 || viz == 4 || viz == 5) {
-		addNew(4)
-	} else if (viz == 1) {
-		addNew(5)
-	} else if (viz == 2 || viz == 3) {
-		addNew(3)
+	if (viz == 1) {
+		addNew(5);
+	} else if (viz == 2) {
+		addNew(3);
+	} else if(viz == 6) {
+		addNew(20);
+	} else if (viz == 4) {
+		addNew(8);
+	} else if (viz == 3 ||viz == 5) {
+		addNew(4);
 	}
 
 	for (var i = 0; i < particles.length; i++) {
@@ -425,36 +423,9 @@ function updateParticles(){
 }
 
 
-function addNew(n){
-	for (var i = 0; i < n; i++) {
-		resetLine();
-	}
-}
-
-
-function addLine(d){
-
-	var pos = getLocs(d, gmap);
-	x = pos.x;
-	y = pos.y;
-	counter++;
-	lines = [];
-	x1 = x;
-	y1 = y;
-	x2 = x1, y2 = y1;
-	curve = random(-0.3, 0.3);
-	change = random(-0.01, 0.01);
-
-	if (config.line_width > 0.1) config.line_width -=0.004;
-
-	curr_line_width = config.line_width;
-	s = rgb(randomInt(100,250));
-
-}
-
 
 function addCircle(d, num, type){
-	``
+
 		var p = new Particle(d, num, type);
 
 		if(viz == 1 || viz == 4 || viz == 5 || viz == 6) {
@@ -474,65 +445,43 @@ function isOverlapping(p2){
 
 		var p = particles[i];
 
-		if(p.show && p2.show && p.me != p2.me
-			&& (viz == 6 && dist(p.x, p.y, p2.x, p2.y) < p.sticky_sz ||
-			viz != 6 && dist(p.x, p.y, p2.x, p2.y) <= (p.sz/2 + p2.sz/2)
-			)) {
+		if(p.show && p2.show && p.me != p2.me){
 
-			hit = true;
+			if(viz == 1 && dist(p.x, p.y, p2.x, p2.y) < (p.sz/2 + p2.sz/2 + 1)) {
 
-			if(viz == 1) {
+				hit = swallow(p, p1);
 
-				if(p2.sz >= p.sz ) {
+			} else if((viz == 5 || viz == 6) && dist(p.x, p.y, p2.x, p2.y) < p.sticky_sz) {
 
-					p2.sz += p.sz/5;
-					if (p2.sz > p2.max_size) p2.sz = p2.max_size;
-					p.show = false;
-					//p2.c = "orange";
+				hit = swallow(p, p1);
 
-				} else {
+			} else if (dist(p.x, p.y, p2.x, p2.y) < (p.sz/2 + p2.sz/2 + 1)) {
 
-					p.sz += p2.sz/2;
-					if (p.sz > p.max_size) p.sz = p.max_size;
-					p2.show = false;
-
-				}
-
-			} else if(viz == 6) {
-
-				if(p.day == p2.day) {
-
-					if (p2.sz >= p.sz ) {
-
-						p2.sz += p.sz/2;
-						if (p2.sz > p2.max_size) p2.sz = p2.max_size;
-						p.show = false;
-						//p2.c = "orange";
-
-					} else if( p2.sz < p.sz ) {
-
-						p.sz += p2.sz/2;
-						if (p.sz > p.max_size) p.sz = p.max_size;
-						p2.show = false;
-
-					}
-				if (p.sz >= p2.sz) {
-					p.show = true;
-					p2.show = false;
-				} else {
-					p2.show = true;
-					p.show = false;
-				}
-				console.log("resetLine");
-				resetLine();
-				}
+				hit = swallow(p, p1);
 
 			}
-			return hit;
+
 		}
 	}
+
+	return hit;
 }
 
+
+function swallow(p, p1){
+	var hit = false;
+
+	if(p2.sz >= p.sz ) {
+		p2.sz += p.sz/5;
+		hit = true;
+		p.show = false;
+	} else {
+		p.sz += p2.sz/5;
+		p2.show = false;
+	}
+
+	return hit;
+}
 
 function getParticleColour(d, type, sz){
 
@@ -549,10 +498,10 @@ function getParticleColour(d, type, sz){
 	}
 
 	if(viz == 1) {
-		if(isDayFiltered()) {
+		if(!isDayOn()) {
 			c = rgb(100 - sz * 20);
 		} else {
-			c = rgb(20 + sz * 20);
+			c = rgb(50 + sz * 20);
 		}
 	}
 
@@ -560,16 +509,16 @@ function getParticleColour(d, type, sz){
 		//console.log(type);
 		if(type == "ok") {
 
-			if(isDayFiltered()) {
+			if(!isDayOn()) {
 				c = rgb(60);
 			} else {
 				c = rgb(80);
 			}
 
 		} else {
-			if (filters.includes('day_checked') && filters.includes('night_checked')){
+			if (isDayOn()){
 				c = rgb(200);
-			} else if(isDayFiltered()) {
+			} else if(!isDayOn()) {
 				c = "#fa7600";
 			} else {
 				c = rgb(200);
@@ -612,14 +561,12 @@ var Particle = function(d, num, type){
 	var pos = getLocs(d, gmap);
 	this.x = pos.x;
 	this.y = pos.y;
-
+	this.c = getParticleColour(d, type, this.sz);
 	this.type = type;
 
 	this.sz = 1 + num * 1.1;
+	this.max_size = randomInt(30, 45);
 
-	this.max_size = randomInt(30, 40);
-
-	this.on = true;
 	this.show = true;
 	this.me = frameCount;
 	var dt = d.DATE + " " + d.TIME;
@@ -627,116 +574,97 @@ var Particle = function(d, num, type){
 	this.day = date.getDay();
 
 	if(viz == 1) {
-		this.on = false;
-		this.sz = 3 + num * 1.1;
-	} else if(viz == 2) {
-		this.sz = 4;
-		this.on = false;
+		this.sz = 2 + num * 2;
 
 	} else if(viz == 3) {
-		this.on = false;
 		this.sz = 2 + this.sz + num * 1.1;
 		if(this.type != "ok") this.sz+=1;
 		this.max_size = randomInt(20, 25);
 
 	} else if(viz == 4) {
-		this.on = false;
 		this.sz = 16;
-
-	} else if(viz == 5) {
-		this.on = false;
 
 	} else if(viz == 6) {
 		this.sticky_sz = 12;
 		if (this.day == 0) this.day = 7;
 	}
 
-	this.c = getParticleColour(d, type, this.sz);
+
 
 	this.update = function(){
 
-		if(viz == 1) {
-			isOverlapping(this);
-		} else if((viz == 6) && this.show) {
-			isOverlapping(this);
-		} else if(this.on && isOverlapping(this)) {
-			this.on = false;
-			resetLine();
-		}
-
-		if(this.show && this.on && this.sz < 30) {
-			this.sz += 0.02;
-		} else if (this.on && this.sz >= 30){
-			this.on = false;
-			//resetLine();
-		}
+		isOverlapping(this);
+		if (this.sz > this.max_size) this.sz = this.max_size;
 
 	}
 
 
 	this.draw = function(){
 
-		if(viz == 1 && this.show) {
-			ctx.strokeStyle = this.c;
-			ctx.lineWidth = 1;
-			ctx.strokeEllipse(this.x, this.y, this.sz, this.sz);
-		} else if (viz == 2){
-			ctx.fillStyle = this.c;
-			ctx.fillEllipse(this.x, this.y, this.sz, this.sz);
-		} else if (viz == 3){
-			if(!isDayFiltered() && this.type != "ok") {
-				ctx.fillStyle = rgb(0);
-				ctx.cross(this.x + 2, this.y + 2, this.sz/4, this.sz);
-			} else {
-				ctx.fillStyle = rgba(0, 0.3);
-				ctx.cross(this.x + 1, this.y + 1, this.sz/4, this.sz);
-			}
-			ctx.fillStyle = this.c;
-			ctx.cross(this.x, this.y, this.sz/4, this.sz);
-		} else if (viz == 4){
+		if(this.show) {
 
-			ctx.fillStyle = this.c;
-			//console.log(this.c);
-			// ctx.centreFillRect(sticky(this.x,this.sz), sticky(this.y,this.sz), this.sz, this.sz);
-			ctx.fillEllipse(sticky(this.x,this.sz), sticky(this.y,this.sz)-0.5, this.sz, this.sz);
-			ctx.fillStyle = "#333";
-			ctx.font = "10px Arial";
-			ctx.textAlign = "center";
+			if(viz == 1) {
+				ctx.strokeStyle = this.c;
+				ctx.lineWidth = 1;
+				ctx.strokeEllipse(this.x, this.y, this.sz, this.sz);
 
-			if(this.type != "ok") {
-				if (this.type == "pedestrians") {
-					var t = "P";
-				} else if (this.type == "cyclists") {
-					var t = "C";
-					//ctx.fillStyle = "#333";
+			} else if (viz == 2){
+				ctx.fillStyle = this.c;
+				ctx.fillEllipse(this.x, this.y, this.sz, this.sz);
+
+			} else if (viz == 3){
+				if(isDayOn() && this.type != "ok") {
+					ctx.fillStyle = rgb(0);
+					ctx.cross(this.x + 2, this.y + 2, this.sz/4, this.sz);
 				} else {
-					var t = "M";
+					ctx.fillStyle = rgba(0, 0.3);
+					ctx.cross(this.x + 1, this.y + 1, this.sz/4, this.sz);
+				}
+				ctx.fillStyle = this.c;
+				ctx.cross(this.x, this.y, this.sz/4, this.sz);
+
+			} else if (viz == 4){
+
+				ctx.fillStyle = this.c;
+				ctx.fillEllipse(sticky(this.x,this.sz), sticky(this.y,this.sz)-0.5, this.sz, this.sz);
+				ctx.fillStyle = "#333";
+				ctx.font = "10px Arial";
+				ctx.textAlign = "center";
+
+				if(this.type != "ok") {
+
+					if (this.type == "pedestrians") {
+						var t = "P";
+					} else if (this.type == "cyclists") {
+						var t = "C";
+					} else {
+						var t = "M";
+					}
+
+					ctx.fillText(t, sticky(this.x, this.sz), sticky(this.y, this.sz) + this.sz/4);
+
 				}
 
-				ctx.fillText(t, sticky(this.x, this.sz), sticky(this.y, this.sz) + this.sz/4);
+			} else if (viz == 5) {
+				ctx.fillStyle = this.c;
+				ctx.LfillEllipse(this.x, this.y, this.sz, this.sz);
 
+			} else if (viz == 6) {
+
+				ctx.font = "10px Arial";
+				ctx.textAlign = "center";
+				ctx.fillStyle = this.c;
+				ctx.centreFillRect(sticky(this.x, this.sticky_sz), sticky(this.y, this.sticky_sz), this.sticky_sz+1, this.sticky_sz+1);
+
+				if(!isDayOn()) {
+					ctx.fillStyle = "#fff";
+				} else {
+					ctx.fillStyle = "#333";
+				}
+
+				ctx.fillText(this.day, sticky(this.x, this.sticky_sz), sticky(this.y, this.sticky_sz) + 3.2);
 			}
-
-		} else if (viz == 5){
-			ctx.fillStyle = this.c;
-			ctx.LfillEllipse(this.x, this.y, this.sz, this.sz);
-
-		} else if (viz == 6 && this.show){
-
-			ctx.font = "10px Arial";
-			ctx.textAlign = "center";
-			ctx.fillStyle = this.c;
-			ctx.centreFillRect(sticky(this.x, this.sticky_sz), sticky(this.y, this.sticky_sz), this.sticky_sz, this.sticky_sz);
-
-			if(isDayFiltered()) {
-				ctx.fillStyle = "#fff";
-			} else {
-				ctx.fillStyle = "#333";
-			}
-
-			ctx.fillText(this.day, sticky(this.x, this.sticky_sz), sticky(this.y, this.sticky_sz) + 3.2);
 		}
-
 	}
 
 }
@@ -744,291 +672,9 @@ var Particle = function(d, num, type){
 
 
 
+$(document).ready(function() {
 
-function addHeatmap(){
-	console.log("addHeatmap");
-
-	heatmapData = new google.maps.MVCArray();
-	heatmap = new google.maps.visualization.HeatmapLayer({
-			data: heatmapData,
-			opacity: 0.6,
-			dissipating: true,
-			maxIntensity: 140,
-			radius: 40,
-			gradient: gradient
-	});
-
-	heatmap.setMap(gmap);
-}
-
-
-function updateTwirlUI(d){
-
-	var dt = d.TIME + " " + d.DATE;
-	var full_date = getDate(d.TIME + " " + d.DATE, 1);
-	if (start_date == "") start_date = full_date;
-
-	$('#twirl_date_holder').html("<b>New York Vehicle Collisions:</b><br>"
-	+ start_date + " - <br>" + full_date + " ");
-}
-
-
-var headline_array = ['Collision Density', 'Heatmap', 'Injuries &amp; Close Calls', 'Most Dangerous Places for Pedestrians, Cyclists &amp; Motorists', 'Day vs Night', 'Most Dangerous Day of the Week'];
-
-function updateUI(d){
-
-	var dt = d.TIME + " " + d.DATE;
-	var full_date = getDate(d.TIME + " " + d.DATE, 1);
-
-	//console.log(dt + " : " + full_date);
-
-	if (start_date == "") start_date = full_date;
-
-	$('#viz_date_holder').html("<b>New York Vehicle Collisions:<br>"
-		+ headline_array[viz-1] + "</b><br>"
-		+ start_date + " - <br>" + full_date + " ");
-
-  $('#all .total .count').html(counter);
-	$('#all .ok .count').html(total_injured);
-	$('#all .injured .count').html(total_injured);
-	$('#all .killed .count').html(total_deaths);
-
-	$('#pedestrians .injured .count').html(total_pedestrians_injured);
-	$('#pedestrians .killed .count').html(total_pedestrians_deaths);
-
-	$('#cyclists .injured .count').html(total_cyclists_injured);
-	$('#cyclists .killed .count').html(total_cyclists_deaths);
-
-	$('#motorists .injured .count').html(total_motorists_injured);
-	$('#motorists .killed .count').html(total_motorists_deaths);
-
-	addDay(d);
-
-  if(killed == 0) {
-    $('#all .killed .bullet').removeClass('active');
-  } else {
-    $('#all .killed .bullet').addClass('active');
-  }
-
-  if(injured == 0) {
-    $('#all .injured .bullet').removeClass('active');
-  } else {
-    $('#all .injured .bullet').addClass('active');
-  }
-
-	if(ok == 0) {
-		$('#all .ok .bullet').removeClass('active');
-	} else {
-		$('#all .ok .bullet').addClass('active');
-	}
-
-  if(pedestrians_injured == 0) {
-    $('#pedestrians .injured .bullet').removeClass('active');
-  } else {
-    $('#pedestrians .injured .bullet').addClass('active');
-  }
-
-	if(pedestrians_killed == 0) {
-    $('#pedestrians .killed .bullet').removeClass('active');
-  } else {
-    $('#pedestrians .killed .bullet').addClass('active');
-  }
-
-	if(cyclists_injured == 0) {
-    $('#cyclists .injured .bullet').removeClass('active');
-  } else {
-    $('#cyclists .injured .bullet').addClass('active');
-  }
-
-  if(cyclists_killed == 0) {
-    $('#cyclists .killed .bullet').removeClass('active');
-  } else {
-    $('#cyclists .killed .bullet').addClass('active');
-  }
-
-	if(motorists_injured == 0) {
-		$('#motorists .injured .bullet').removeClass('active');
-  } else {
-		$('#motorists .injured .bullet').addClass('active');
-  }
-
-  if(motorists_killed == 0) {
-		$('#motorists .killed .bullet').removeClass('active');
-  } else {
-		$('#motorists .killed .bullet').addClass('active');
-  }
-
-
-}
-
-
-function isDayFiltered(){
-	if((filters.includes('day_checked') && !filters.includes('night_checked')) || (filters.includes('day_checked') && filters.includes('night_checked'))) {
-		return true;
-	}
-}
-
-function getDayType(dt){
-	if(isDay(dt)) {
-		return day_type = "day";
-	} else {
-		return day_type = "night";
-	}
-}
-
-
-
-function addDay(d){
-
-	var dt = d.TIME + " " + d.DATE;
-	var day_type = getDayType(dt);
-	var day_number = getDayNumber(dt);
-
-
-	$('#days .mon .count').html(monday);
-	$('#days .tues .count').html(tuesday);
-	$('#days .wed .count').html(wednesday);
-	$('#days .thurs .count').html(thursday);
-	$('#days .fri .count').html(friday);
-	$('#days .sat .count').html(saturday);
-	$('#days .sun .count').html(sunday);
-
-	$('#days .day .bullet').removeClass('active');
-	$('#days .night .bullet').removeClass('active');
-	$('#days .mon .bullet').removeClass('active');
-	$('#days .tues .bullet').removeClass('active');
-	$('#days .wed .bullet').removeClass('active');
-	$('#days .thurs .bullet').removeClass('active');
-	$('#days .fri .bullet').removeClass('active');
-	$('#days .sat .bullet').removeClass('active');
-	$('#days .sun .bullet').removeClass('active');
-
-	if(frameCount%2 == 0) {
-
-		if (isDay(dt)) {
-			$('#days .day .bullet').addClass('active');
-		} else {
-			$('#days .night .bullet').addClass('active');
-		}
-
-		if (day_number == 1) {
-			monday++;
-			$('#days .mon .bullet').addClass('active');
-		}
-		if (day_number == 2) {
-			tuesday++;
-			$('#days .tues .bullet').addClass('active');
-		}
-		if (day_number == 3) {
-			wednesday++;
-			$('#days .wed .bullet').addClass('active');
-		}
-		if (day_number == 4) {
-			thursday++;
-			$('#days .thurs .bullet').addClass('active');}
-		if (day_number == 5) {
-			friday++;
-			$('#days .fri .bullet').addClass('active');}
-		if (day_number == 6) {
-			saturday++;
-			$('#days .sat .bullet').addClass('active');}
-		if (day_number == 7 || day_number == 0) {
-			sunday++;
-			$('#days .sun .bullet').addClass('active');}
-
-	}
-}
-
-
-function makeInfoWindowContent(d){
-
-	var dt = getDate(d.TIME + " " + d.DATE, 1);
-
-	var txt = '<div class="info_content" class="text-center">';
-	txt += "<div class='info_date'>" + dt + "</div><br>";
-	txt += "<h3>"
-	if(d['BOROUGH'] != "") txt += d.BOROUGH;
-	if(d['CROSS STREET NAME'] != "") txt += ": " + d['CROSS STREET NAME'];
-	txt +="</h3>";
-
-
-	txt += "<div class='info_injuries half-top'>";
-
-	txt += "<span style='color: #496b8e'>";
-	if(d['NUMBER OF PEDESTRIANS INJURED'] != undefined && parseInt(d['NUMBER OF PEDESTRIANS INJURED']) != 0) {
-		txt += "Cyclists Injured: " + d['NUMBER OF PEDESTRIANS INJURED'] + " ";
-	}
-
-	if(d['NUMBER OF PEDESTRIANS KILLED'] != undefined && parseInt(d['NUMBER OF PEDESTRIANS KILLED']) != 0) {
-		txt += "Pedestrians Killed: " + d['NUMBER OF PEDESTRIANS KILLED'] + "<br>";
-	}
-	txt += "</span>";
-
-	txt += "<span style='color: #496b8e'>";
-
-	if(d['NUMBER OF CYCLIST INJURED'] != undefined && parseInt(d['NUMBER OF CYCLIST INJURED']) != 0) {
-		txt += "Cyclists Injured: " + d['NUMBER OF CYCLIST INJURED'] + " ";
-	}
-
-	if(d['NUMBER OF CYCLIST KILLED'] != undefined && parseInt(d['NUMBER OF CYCLIST KILLED']) != 0) {
-		txt += "Cyclists Killed: " +d['NUMBER OF CYCLIST KILLED'] + "<br>";
-	}
-	txt += "</span>";
-
-	txt += "<span style='color: #496b8e'>";
-
-	if(d['NUMBER OF MOTORIST INJURED'] != undefined && parseInt(d['NUMBER OF MOTORIST INJURED']) != 0) {
-		txt += "Motorists Injured: " +d['NUMBER OF MOTORIST INJURED'] + " ";
-	}
-
-	if(d['NUMBER OF MOTORIST KILLED'] != undefined && parseInt(d['NUMBER OF MOTORIST KILLED']) != 0) {
-		txt += "Motorists Killed: " + d['NUMBER OF MOTORIST KILLED'] + "<br>";
-	}
-	txt += "</span>";
-
-
-
-	if(d["CONTRIBUTING FACTOR VEHICLE 1"] != "" && d["CONTRIBUTING FACTOR VEHICLE 2"] != "") {
-		txt +="<h4>Contributing Factors: ";
-		if(d["CONTRIBUTING FACTOR VEHICLE 1"] != "" && d["CONTRIBUTING FACTOR VEHICLE 1"] != "Unspecified") txt += d["CONTRIBUTING FACTOR VEHICLE 1"] + " ";
-		if(d["CONTRIBUTING FACTOR VEHICLE 2"] != "" && d["CONTRIBUTING FACTOR VEHICLE 2"] != "Unspecified") txt += d["CONTRIBUTING FACTOR VEHICLE 2"] + " ";
-		if(d["CONTRIBUTING FACTOR VEHICLE 3"] != "" && d["CONTRIBUTING FACTOR VEHICLE 3"] != "Unspecified") txt += d["CONTRIBUTING FACTOR VEHICLE 3"] + " ";
-		txt +="</h4>";
-	}
-
-
-	txt +='</div>';
-
-	return txt;
-;
-}
-
-
-
-
-	 $('.close').on('click',function(){
-	 	$('.holder').toggleClass('hidden');
-	 	if($('.holder').hasClass('hidden')) {
-	 		$('.close').html("+");
-	 	} else {
-	 		$('.close').html("x");
-	 	}
-	 })
-
-
-
-	 function drawGraph(){
-
-	   var pos = map(counter, 0, data.length, 0, w);
-	   ctx2.fillStyle = "#0f94c7";
-	   ctx2.fillRect(0, 0, pos, 6);
-
-	 }
-
-var page = 1;
-
-	 $(document).ready(function() {
-	 	$('#fullpage').fullpage({
+	$('#fullpage').fullpage({
 			navigation: true,
 			keyboardScrolling: true,
 			scrollBar: true,
@@ -1053,7 +699,14 @@ var page = 1;
 				} else if(index == 3){
 					page = 3;
 				}
-			//console.log(page);
+
 		}
 		});
-	 });
+});
+
+
+	 function addNew(n){
+	 	for (var i = 0; i < n; i++) {
+	 		nextDataPoint();
+	 	}
+	 }
