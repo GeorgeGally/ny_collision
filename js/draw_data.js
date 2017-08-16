@@ -449,15 +449,15 @@ function isOverlapping(p2){
 
 			if(viz == 1 && dist(p.x, p.y, p2.x, p2.y) < (p.sz/2 + p2.sz/2 + 1)) {
 
-				hit = swallow(p, p1);
+				hit = swallow(p, p2);
 
 			} else if((viz == 5 || viz == 6) && dist(p.x, p.y, p2.x, p2.y) < p.sticky_sz) {
 
-				hit = swallow(p, p1);
+				hit = swallow(p, p2);
 
 			} else if (dist(p.x, p.y, p2.x, p2.y) < (p.sz/2 + p2.sz/2 + 1)) {
 
-				hit = swallow(p, p1);
+				hit = swallow(p, p2);
 
 			}
 
@@ -468,7 +468,7 @@ function isOverlapping(p2){
 }
 
 
-function swallow(p, p1){
+function swallow(p, p2){
 	var hit = false;
 
 	if(p2.sz >= p.sz ) {
