@@ -472,11 +472,11 @@ function swallow(p, p2){
 	var hit = false;
 
 	if(p2.sz >= p.sz ) {
-		p2.sz += p.sz/5;
+		if(viz != 3) p2.sz += p.sz/5;
 		hit = true;
 		p.show = false;
 	} else {
-		p.sz += p2.sz/5;
+		if(viz != 3) p.sz += p2.sz/5;
 		p2.show = false;
 	}
 
