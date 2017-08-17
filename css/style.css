@@ -88,8 +88,8 @@ canvas, #map {
   right: 0;
   background-size: cover;
   z-index: 0;
-}
-
+  -webkit-transform: translate3d(0, 0, 0);
+  image-rendering: optimizeSpeed; // Older versions of FF image-rendering: -moz-crisp-edges; // FF 6.0+ image-rendering: -webkit-optimize-contrast; // Webkit // (Safari now, Chrome soon) image-rendering: -o-crisp-edges; // OS X & Windows Opera (12.02+) image-rendering: optimize-contrast; // Possible future browsers. -ms-interpolation-mode: nearest-neighbor; // IE }
 
 .info_content { font-size: 15px; }
 .info_content h3 { font-weight: bold; }

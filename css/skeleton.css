@@ -190,9 +190,7 @@
         .container .offset-by-fourteen,
         .container .offset-by-fifteen { padding-left: 0; }
         .txt { margin-top: 40px !important;}
-        .txt p {
-    padding-left: 0px !important;;
-}
+        .txt p { padding-left: 0px !important; }
     }
 
 
@@ -227,9 +225,7 @@
         .container .two-thirds.column { width: 96%; margin: 0 2% 0 2% }
 
         .txt { margin-top: 40px !important;}
-        .txt p {
-    padding-left: 0px !important;;
-}
+        .txt p { padding-left: 0px !important; }
     }
 
 

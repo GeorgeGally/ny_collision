@@ -6,6 +6,15 @@ var canvas2 = document.getElementById('canvas2');
 var ctx2 = canvas2.getContext('2d');
 //var ctx3 = createCanvas("canvas3");
 
+var m_img = new Image();
+m_img.src = "img/m.png";
+
+var c_img = new Image();
+c_img.src = "img/c.png";
+
+var p_img = new Image();
+p_img.src = "img/p.png";
+
 
 frameRate = 120;
 
@@ -160,24 +169,25 @@ var mapLoaded = false;
 var start_date = "";
 
 
-function nextDataPoint(d){
+function nextDataPoint(){
 
 	if(data.length >0 && counter < data.length-1) {
-
+		//console.log(filters);
 		var d = data[counter];
 
 		c = 0;
 		var total = 0;
-		updateUI(d, 'date_holder');
 
-		if(isCorrectTime(d) && isCorrectDay(d)){
+		injured = 0, killed = 0;
+		pedestrian = 0, cyclist = 0, motorist = 0, ok = 0;
+		pedestrians_injured = 0, cyclists_injured = 0, motorists_injured = 0;
+		pedestrians_killed = 0, cyclists_killed = 0, motorists_killed = 0;
 
-			injured = 0, killed = 0;
-			pedestrian = 0, cyclist = 0, motorist = 0, ok = 0;
-			pedestrians_injured = 0, cyclists_injured = 0, motorists_injured = 0;
-			pedestrians_killed = 0, cyclists_killed = 0, motorists_killed = 0;
+		if(isCorrectTime(d) && isCorrectDay(d)) {
 
-			if (d['NUMBER OF PEDESTRIANS INJURED'] != undefined && parseInt(d['NUMBER OF PEDESTRIANS INJURED']) > 0) {
+
+
+			if (filters.includes('total_injured') && filters.includes('pedestrians_checked') && d['NUMBER OF PEDESTRIANS INJURED'] != undefined && parseInt(d['NUMBER OF PEDESTRIANS INJURED']) > 0) {
 
 				var n = parseInt(d['NUMBER OF PEDESTRIANS INJURED']);
 				total_pedestrians_injured += n;
@@ -187,7 +197,7 @@ function nextDataPoint(d){
 
 			}
 
-			if (d['NUMBER OF PEDESTRIANS KILLED'] != undefined && parseInt(d['NUMBER OF PEDESTRIANS KILLED']) > 0) {
+			if (filters.includes('total_killed') && filters.includes('pedestrians_checked') && d['NUMBER OF PEDESTRIANS KILLED'] != undefined && parseInt(d['NUMBER OF PEDESTRIANS KILLED']) > 0) {
 
 				var n = parseInt(d['NUMBER OF PEDESTRIANS KILLED']);
 				total_pedestrians_deaths += n;
@@ -197,7 +207,7 @@ function nextDataPoint(d){
 
 			}
 
-			if (d['NUMBER OF CYCLIST INJURED'] != undefined && parseInt(d['NUMBER OF CYCLIST INJURED']) > 0) {
+			if (filters.includes('total_injured') && filters.includes('cyclists_checked') && d['NUMBER OF CYCLIST INJURED'] != undefined && parseInt(d['NUMBER OF CYCLIST INJURED']) > 0) {
 				var n = parseInt(d['NUMBER OF CYCLIST INJURED']);
 				total_cyclists_injured += n;
 				cyclist += n;
@@ -205,7 +215,7 @@ function nextDataPoint(d){
 				cyclists_injured = n;
 			}
 
-			if(d['NUMBER OF CYCLIST KILLED'] != undefined && parseInt(d['NUMBER OF CYCLIST KILLED']) > 0) {
+			if(filters.includes('total_killed') && filters.includes('cyclists_checked') && d['NUMBER OF CYCLIST KILLED'] != undefined && parseInt(d['NUMBER OF CYCLIST KILLED']) > 0) {
 				var n = parseInt(d['NUMBER OF CYCLIST KILLED']);
 				total_cyclists_deaths += n;
 				cyclist += n;
@@ -213,7 +223,7 @@ function nextDataPoint(d){
 				cyclists_killed = n;
 			}
 
-			if(d['NUMBER OF MOTORIST INJURED'] != undefined && parseInt(d['NUMBER OF MOTORIST INJURED']) > 0) {
+			if(filters.includes('total_injured') && filters.includes('motorists_checked') && d['NUMBER OF MOTORIST INJURED'] != undefined && parseInt(d['NUMBER OF MOTORIST INJURED']) > 0) {
 				var n = parseInt(d['NUMBER OF MOTORIST INJURED']);
 				total_motorists_injured += n;
 				motorist += n;
@@ -221,7 +231,7 @@ function nextDataPoint(d){
 				motorists_injured = n;
 			}
 
-			if(d['NUMBER OF MOTORIST KILLED'] != undefined && parseInt(d['NUMBER OF MOTORIST KILLED']) > 0) {
+			if(filters.includes('total_killed') && filters.includes('motorists_checked') && d['NUMBER OF MOTORIST KILLED'] != undefined && parseInt(d['NUMBER OF MOTORIST KILLED']) > 0) {
 				var n = parseInt(d['NUMBER OF MOTORIST KILLED'])
 				total_motorists_deaths += n;
 				motorist += n;
@@ -233,19 +243,19 @@ function nextDataPoint(d){
 			total_deaths += killed;
 			total_injured += injured;
 
-			if(filters.includes('motorists_checked') && motorists_killed > 0) {
+			if(filters.includes('total_killed') && filters.includes('motorists_checked') && motorists_killed > 0) {
 				total += motorists_killed;
 				addMarker(d, counter);
 				addViz(d, motorists_killed, 'motorists');
 
 			}
 
-			if(filters.includes('motorists_checked') && motorists_injured > 0) {
+			if(filters.includes('total_injured') && filters.includes('motorists_checked') && motorists_injured > 0) {
 				total += motorists_injured;
 				addViz(d, motorists_injured, 'motorists');
 			}
 
-			if(filters.includes('cyclists_checked') && cyclists_killed > 0) {
+			if( filters.includes('total_killed') &&filters.includes('total_killed') && filters.includes('cyclists_checked') && cyclists_killed > 0) {
 				total += cyclists_killed;
 				addMarker(d, counter);
 				addViz(d, cyclists_killed, 'cyclists');
@@ -255,11 +265,12 @@ function nextDataPoint(d){
 				addViz(d, cyclists_injured, 'cyclists');
 			}
 
-			if(filters.includes('pedestrians_checked') && pedestrians_killed > 0) {
+			if(filters.includes('total_killed') && filters.includes('total_killed') && filters.includes('pedestrians_checked') && pedestrians_killed > 0) {
 				total += pedestrians_killed;
 				addMarker(d, counter);
 				addViz(d, pedestrians_killed, 'pedestrians');
 			}
+
 			if(filters.includes('pedestrians_checked') && pedestrians_injured > 0) {
 				total += pedestrians_injured;
 				addViz(d, pedestrians_injured, 'pedestrians');
@@ -278,6 +289,7 @@ function nextDataPoint(d){
 			}
 
 		}
+		updateUI(d, 'date_holder');
 		counter++;
 	}
 }
@@ -291,36 +303,6 @@ function nextDataPoint(d){
 		}
 
 	}
-
-
-	function isCorrectDay(d){
-		var dt = d.TIME + " " + d.DATE;
-		var day_number = getDayNumber(dt);
-		if((filters.includes("sun_check") && day_number == 0)
-		|| (filters.includes("mon_check") && day_number == 1)
-		|| (filters.includes("tues_check") && day_number == 2)
-		|| (filters.includes("wed_check") && day_number == 3)
-		|| (filters.includes("thurs_check") && day_number == 4)
-		|| (filters.includes("fri_check") && day_number == 5)
-		|| (filters.includes("sat_check") && day_number == 6)
-		|| (!filters.includes("sun_check") && !filters.includes("mon_check") && !filters.includes("tues_check") && !filters.includes("wed_check") && !filters.includes("thurs_check") && !filters.includes("fri_check") && !filters.includes("sat_check"))
-		){
-			return true;
-		}
-	}
-
-	function isCorrectTime(d){
-		var dt = d.TIME + " " + d.DATE;
-		var day_type = getDayType(dt);
-
-		if((filters.includes('day_checked') && isDay(dt))
-		|| (filters.includes('night_checked') && !isDay(dt))
-		|| (!filters.includes('day_checked') && !filters.includes('night_checked'))
-		){
-			return true;
-		}
-	}
-
 
 
 function loadData(){
@@ -350,8 +332,6 @@ function loadData(){
 }
 
 function filter() {
-
-	console.log("filter");
 
 	viz = $('#viz_type').val();
 
@@ -402,13 +382,13 @@ function draw() {
 function updateParticles(){
 
 	if (viz == 1) {
-		addNew(5);
+		addNew(20);
 	} else if (viz == 2) {
 		addNew(3);
 	} else if(viz == 6) {
 		addNew(20);
 	} else if (viz == 4) {
-		addNew(8);
+		addNew(20);
 	} else if (viz == 3 ||viz == 5) {
 		addNew(4);
 	}
@@ -428,7 +408,7 @@ function addCircle(d, num, type){
 
 		var p = new Particle(d, num, type);
 
-		if(viz == 1 || viz == 4 || viz == 5 || viz == 6) {
+		if(viz == 4 || viz == 5 || viz == 6) {
 			particles.push(p);
 		} else if(!isOverlapping(p)) {
 			particles.push(p);
@@ -447,7 +427,7 @@ function isOverlapping(p2){
 
 		if(p.show && p2.show && p.me != p2.me){
 
-			if(viz == 1 && dist(p.x, p.y, p2.x, p2.y) < (p.sz/2 + p2.sz/2 + 1)) {
+			if(viz == 1 && (dist(p.x, p.y, p2.x, p2.y) <= (p.sz/2 + p2.sz/2 + 1) || (p.x == p2.x && p.y == p2.y))) {
 
 				hit = swallow(p, p2);
 
@@ -487,8 +467,9 @@ function getParticleColour(d, type, sz){
 
 	//console.log(isDayFiltered());
 
-	var dt = d.DATE + " "+ d.TIME;
-	var date = new Date(dt)
+	var dt = d.DATE + ", " + d.TIME;
+	var date = Date.parse(dt)
+	//var date = new Date(dt)
 	var day = date.getDay();
 
 	if(isDay(dt)) {
@@ -569,8 +550,9 @@ var Particle = function(d, num, type){
 
 	this.show = true;
 	this.me = frameCount;
-	var dt = d.DATE + " " + d.TIME;
-	var date = new Date(dt)
+	var dt = d.DATE + ", " + d.TIME;
+	var date = Date.parse(dt)
+	//var date = new Date(dt)
 	this.day = date.getDay();
 
 	if(viz == 1) {
@@ -582,7 +564,7 @@ var Particle = function(d, num, type){
 		this.max_size = randomInt(20, 25);
 
 	} else if(viz == 4) {
-		this.sz = 16;
+		this.sticky = 18;
 
 	} else if(viz == 6) {
 		this.sticky_sz = 12;
@@ -626,22 +608,20 @@ var Particle = function(d, num, type){
 			} else if (viz == 4){
 
 				ctx.fillStyle = this.c;
-				ctx.fillEllipse(sticky(this.x,this.sz), sticky(this.y,this.sz)-0.5, this.sz, this.sz);
-				ctx.fillStyle = "#333";
-				ctx.font = "10px Arial";
-				ctx.textAlign = "center";
-
+				ctx.LfillEllipse(sticky(this.x,this.sticky), sticky(this.y,this.sticky)-0.5, this.sticky-2, this.sticky-2);
+				//ctx.centreFillRect(sticky(this.x,this.sticky), sticky(this.y,this.sticky)-0.5, this.sticky-2, this.sticky-2);
+				//ctx.fillPolygon(sticky(this.x,this.sticky), sticky(this.y,this.sticky)-0.5, 6, this.sticky/2);
 				if(this.type != "ok") {
 
 					if (this.type == "pedestrians") {
-						var t = "P";
+						var type_img = p_img;
 					} else if (this.type == "cyclists") {
-						var t = "C";
+						var type_img = c_img;
 					} else {
-						var t = "M";
+						var type_img = m_img;
 					}
-
-					ctx.fillText(t, sticky(this.x, this.sz), sticky(this.y, this.sz) + this.sz/4);
+					ctx.drawImage(type_img, sticky(this.x, this.sticky) - 8, sticky(this.y, this.sticky)-8.5)
+					//ctx.fillText(t, sticky(this.x, this.sticky), sticky(this.y, this.sticky) + this.sticky/4 - 1);
 
 				}
 
@@ -705,8 +685,8 @@ $(document).ready(function() {
 });
 
 
-	 function addNew(n){
-	 	for (var i = 0; i < n; i++) {
-	 		nextDataPoint();
-	 	}
-	 }
+function addNew(n){
+	for (var i = 0; i < n; i++) {
+		nextDataPoint();
+	}
+}

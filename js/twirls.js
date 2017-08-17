@@ -151,7 +151,7 @@ return is_hit;
 
 function updateTwirlUI(d){
 
-	var dt = d.TIME + " " + d.DATE;
+	var dt = d.DATE + ", " + d.TIME;
 	var full_date = getDateTime(d);
 	if (start_date == "") start_date = full_date;
 

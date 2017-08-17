@@ -190,7 +190,7 @@ if(target == "motorists_injured" || target == "motorists_killed"){
 
 
 
- 	function turnDays(val){
+ function turnDays(val){
  		$('#mon_check').prop( "checked", val );
  		$('#tues_check').prop( "checked", val );
  		$('#wed_check').prop( "checked", val );
@@ -199,7 +199,7 @@ if(target == "motorists_injured" || target == "motorists_killed"){
  		$('#sat_check').prop( "checked", val );
  		$('#sun_check').prop( "checked", val );
  		$('#days_checked').prop( "checked", val );
- 	}
+ }
 
   function turnAllChecked(val){
   	//$('#total_injured').prop( "checked", val );
@@ -226,7 +226,7 @@ if(target == "motorists_injured" || target == "motorists_killed"){
 
   function updateUI(d){
 
-  	var dt = d.TIME + " " + d.DATE;
+  	// var dt = d.DATE + ", " + d.TIME;
   	var full_date = getDateTime(d);
 
   	if (start_date == "") start_date = full_date;
@@ -312,7 +312,7 @@ if(target == "motorists_injured" || target == "motorists_killed"){
 
   function addDay(d){
 
-  	var dt = d.TIME + " " + d.DATE;
+  	var dt = d.DATE + ", " + d.TIME;
   	var day_type = getDayType(dt);
   	var day_number = getDayNumber(dt);
 
@@ -335,42 +335,77 @@ if(target == "motorists_injured" || target == "motorists_killed"){
   	$('#days .sat .bullet').removeClass('active');
   	$('#days .sun .bullet').removeClass('active');
 
-  	if(frameCount%2 == 0) {
-
   		if (isDay(dt)) {
   			$('#days .day .bullet').addClass('active');
   		} else {
   			$('#days .night .bullet').addClass('active');
   		}
 
-  		if (day_number == 1) {
-  			monday++;
-  			$('#days .mon .bullet').addClass('active');
-  		}
-  		if (day_number == 2) {
-  			tuesday++;
-  			$('#days .tues .bullet').addClass('active');
-  		}
-  		if (day_number == 3) {
-  			wednesday++;
-  			$('#days .wed .bullet').addClass('active');
-  		}
-  		if (day_number == 4) {
-  			thursday++;
-  			$('#days .thurs .bullet').addClass('active');}
-  		if (day_number == 5) {
-  			friday++;
-  			$('#days .fri .bullet').addClass('active');}
-  		if (day_number == 6) {
-  			saturday++;
-  			$('#days .sat .bullet').addClass('active');}
-  		if (day_number == 7 || day_number == 0) {
-  			sunday++;
-  			$('#days .sun .bullet').addClass('active');}
-
-  	}
+  		updateDays(day_number);
   }
 
+
+  function updateDays(day_number){
+    var day_counter = 0;
+    // console.log(filters);
+    if(filters.includes('total_injured') && filters.includes('pedestrians_checked') && pedestrians_injured) {
+      day_counter += pedestrians_injured;
+    }
+    if(filters.includes('total_injured') && filters.includes('cyclists_checked') && cyclists_injured) {
+      day_counter += cyclists_injured;
+    }
+    if(filters.includes('total_injured') && filters.includes('motorists_checked') && motorists_injured) {
+      day_counter += motorists_injured;
+    }
+
+    if(filters.includes('total_killed') && filters.includes('pedestrians_checked') && pedestrians_killed) {
+      day_counter += pedestrians_killed;
+    }
+    if(filters.includes('total_killed') && filters.includes('cyclists_checked') && cyclists_killed) {
+      day_counter += cyclists_killed;
+    }
+    if(filters.includes('total_killed') && filters.includes('motorists_checked') && motorists_killed) {
+      day_counter += motorists_killed;
+    }
+
+    //console.log(day_counter);
+
+    if (day_number == 1) {
+      monday+=day_counter;
+      $('#days .mon .bullet').addClass('active');
+    }
+
+    if (day_number == 2) {
+      tuesday+=day_counter;
+      $('#days .tues .bullet').addClass('active');
+    }
+
+    if (day_number == 3) {
+      wednesday+=day_counter;
+      $('#days .wed .bullet').addClass('active');
+    }
+
+    if (day_number == 4) {
+      thursday+=day_counter;
+      $('#days .thurs .bullet').addClass('active');
+    }
+
+    if (day_number == 5) {
+      friday+=day_counter;
+      $('#days .fri .bullet').addClass('active');
+    }
+
+    if (day_number == 6) {
+      saturday+=day_counter;
+      $('#days .sat .bullet').addClass('active');
+    }
+
+    if (day_number == 7 || day_number == 0) {
+      sunday+=day_counter;
+      $('#days .sun .bullet').addClass('active');
+    }
+
+  }
 
   $('.close').on('click',function(){
 

@@ -22,10 +22,11 @@ return weekday[d.getDay()];
 
 
 
-function getDate(dt, clock){
+function getFormattedDate(dt, clock){
 
   var clock = clock || false;
-	var date = new Date(dt)
+	// var date = new Date(dt)
+  var date = Date.parse(dt)
 	var day = date.getDate();
   var day_name = getDay(date);
 	var monthIndex = date.getMonth();
@@ -50,7 +51,8 @@ function getDate(dt, clock){
 }
 
 function getDateTime(d){
-  return getDate(d.TIME + " " + d.DATE, 1);
+
+  return getFormattedDate(d.DATE + ", " + d.TIME , 1);
 }
 
 
@@ -70,7 +72,7 @@ function getDay(d){
 
 function isDay(dt){
 
-	var date = new Date(dt)
+  var date = Date.parse(dt);
 	var day = date.getDate();
 	var hour = date.getHours();
   return (hour >= 5 && hour < 19);
@@ -86,6 +88,38 @@ function getDayType(dt){
 }
 
 
+
+	function isCorrectDay(d){
+		var dt = d.DATE + ", " + d.TIME;
+		var day_number = getDayNumber(dt);
+		if((filters.includes("sun_check") && day_number == 0)
+		|| (filters.includes("mon_check") && day_number == 1)
+		|| (filters.includes("tues_check") && day_number == 2)
+		|| (filters.includes("wed_check") && day_number == 3)
+		|| (filters.includes("thurs_check") && day_number == 4)
+		|| (filters.includes("fri_check") && day_number == 5)
+		|| (filters.includes("sat_check") && day_number == 6)
+		|| (!filters.includes("sun_check") && !filters.includes("mon_check") && !filters.includes("tues_check") && !filters.includes("wed_check") && !filters.includes("thurs_check") && !filters.includes("fri_check") && !filters.includes("sat_check"))
+		){
+			return true;
+		}
+	}
+
+	function isCorrectTime(d){
+		var dt = d.DATE + ", " + d.TIME;
+		var day_type = getDayType(dt);
+
+		if((filters.includes('day_checked') && isDay(dt))
+		|| (filters.includes('night_checked') && !isDay(dt))
+		|| (!filters.includes('day_checked') && !filters.includes('night_checked'))
+		){
+			return true;
+		}
+	}
+
+
+
+
 var monthNames = [
     "January", "February", "March",
     "April", "May", "June", "July",
@@ -94,7 +128,7 @@ var monthNames = [
 ];
 
 function getDayNumber(dt){
-	var current_date = new Date(dt);
+  var current_date = Date.parse(dt)
 	return parseInt(current_date.getDay());
 }
 

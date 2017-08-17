@@ -284,7 +284,8 @@ function makeInfoWindowContent(d){
 	 	var icon = 'img/red_cross.png';
 
 	 	if(viz == 5){
-	 		var dt = d.DATE + " " + d.TIME;
+
+	 		var dt = d.DATE + ", " + d.TIME;
 	 		if(isDay(dt)) {
 	 			icon = 'img/blue_cross.png';
 	 		} else {
