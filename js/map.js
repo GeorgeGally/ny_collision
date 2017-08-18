@@ -294,11 +294,11 @@ function makeInfoWindowContent(d){
 
 	 	} else if (viz == 4){
 	 		if(pedestrians_killed > 0) {
-	 			icon = 'img/pink_cross.png';
+	 			icon = 'img/pedestrian_cross.png';
 	 		} else if(cyclists_killed > 0) {
-	 			icon = 'img/green_cross.png';
+	 			icon = 'img/cyclist_cross.png';
 	 		} else if(motorists_killed > 0) {
-	 			icon = 'img/blue_cross2.png';
+	 			icon = 'img/motorist_cross.png';
 	 		}
 
 	 	} else if (viz == 2) {
